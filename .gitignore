@@ -2,3 +2,4 @@
 *pycache*
 *migrations*
 .idea/
+db.sqlite3
