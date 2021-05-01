@@ -233,7 +233,7 @@ def get_visit_detail(request, visit_id):
 def health(request):
     if request.method == 'GET':
         try:
-            return response.success_response({})
+            return response.success_response("OK")
 
         except Exception as e:
             return response.internal_server_error_response()
