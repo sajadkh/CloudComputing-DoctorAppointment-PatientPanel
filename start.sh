@@ -1,10 +1,8 @@
 #!/bin/bash
 
 echo "start customer service...."
-echo "create database..."
-python initializer.py
 echo "django makemigrations..."
-python manage.py makemigrations appCustomer
+python manage.py makemigrations appPatient
 echo "django migrate..."
 python manage.py migrate
 echo "run server..."
