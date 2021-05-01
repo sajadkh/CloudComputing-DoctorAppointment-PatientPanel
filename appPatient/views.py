@@ -18,9 +18,9 @@ PANEL_TOKEN = "Y3VzdG9tZXI6Y3VzdG9tZXJAbG9jYWwuY29tOklOVEVSTkFMOjk5OTk5OQ=="
 
 
 def token_validation(
-    token):
+        token):
     r = requests.post("http://authentication:8000/auth/verify", data={}, headers={"token": token})
-    
+
     if r.status_code == 200:
         info = r.json()['data']
         return info
@@ -41,7 +41,6 @@ def extract_request_data_post(request):
 
 def extract_request_headers(request):
     return request.headers
-
 
 
 def validate_required_body_items(required_fields, request_data):
@@ -151,7 +150,7 @@ def visit_req(request):
 
             # Validate Data
             request_data = extract_request_data_post(request)
-            required_data_fields = ["restaurant", "foods"]
+            required_data_fields = ["doctor_id", "datetime"]
             errors = validate_required_body_items(required_data_fields, request_data)
 
             if len(errors) > 0:
@@ -162,15 +161,15 @@ def visit_req(request):
             if info['role'] != "PATIENT":
                 return response.forbidden_response()
 
-            doctor_id         = request_data['doctor_id']
-            username          = info['username']
+            doctor_id = request_data['doctor_id']
+            username = info['username']
 
-            visit             = Visit(doctor_id=doctor_id, customer=username)
+            visit = Visit(doctor_id=doctor_id, customer=username)
 
-            result            = request_visit(visit.restaurant, visit.customer, request_data['foods'])
-            visit.datetime    = result["datetime"]
-            visit.id          = result["id"]
-            visit.status      = result["status"]
+            result = request_visit(visit.restaurant, visit.customer, request_data['datetime'])
+            visit.datetime = result["datetime"]
+            visit.id = result["id"]
+            visit.status = result["status"]
             visit.save()
             return response.success_response(VisitRequestSerializer(visit).data)
 
@@ -206,9 +205,9 @@ def get_visit_detail(request, visit_id):
             if info['role'] != "PATIENT":
                 return response.forbidden_response()
 
-            visit            = Visit.objects.get(id=visit_id)
-            visit_info       = get_visit(visit.doctor_id, visit.id)
-            visit.status     = visit_info["status"]
+            visit = Visit.objects.get(id=visit_id)
+            visit_info = get_visit(visit.doctor_id, visit.id)
+            visit.status = visit_info["status"]
             visit_info["id"] = visit.id
             visit.save()
 
@@ -228,3 +227,13 @@ def get_visit_detail(request, visit_id):
                     return response.bad_request_response(e.message)
             else:
                 return response.internal_server_error_response()
+
+
+@csrf_exempt
+def health(request):
+    if request.method == 'GET':
+        try:
+            return response.success_response({})
+
+        except Exception as e:
+            return response.internal_server_error_response()
